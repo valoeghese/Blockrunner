@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "blockrunner",
+  "version": "1.0.0",
+  
+  "name": "Blockrunner",
+  "description": "Mod Description.",
+  "authors": [
+    "Me!"
+  ],
+  
+  "icon": "assets/blockrunner/icon.png",
+  "license": "No Licence.",
+  
+  "environment": "*",
+  
+  "requires": {
+    "fabricloader": ">=0.4.0"
+  }
+}
