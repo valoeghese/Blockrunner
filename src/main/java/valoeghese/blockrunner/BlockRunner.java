@@ -34,7 +34,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldView;
+import net.minecraft.world.WorldAccess;
 
 public class BlockRunner {
 	private BlockRunner(List<Entry> values) {
@@ -54,8 +54,9 @@ public class BlockRunner {
 
 		private Stream<Entry> positions; 
 
-		private Builder append() {
-			
+		private Builder append(Set<Entry> entries) {
+			this.positions = Stream.concat(this.positions, entries.stream());
+			return this;
 		}
 
 		public Builder map(Function<BlockPos, BlockPos> mappingFunction) {
@@ -83,8 +84,8 @@ public class BlockRunner {
 		}
 
 		public Builder when(Predicate<BlockPos> condition, Function<Builder, Builder> callback) {
-			Set<Entry> entries = this.positions.collect(Collectors.toSet());
-			this.positions.
+			Set<Entry> entries = this.positions.filter(entry -> !condition.test(entry.pos)).collect(Collectors.toSet());
+			return callback.apply(new Builder(this.positions.filter(entry -> condition.test(entry.pos)))).append(entries);
 		}
 
 		public BlockRunner build() {
@@ -92,8 +93,14 @@ public class BlockRunner {
 		}
 	}
 
-	public void generate(WorldView world, BlockPos pos) {
+	public void generate(WorldAccess world, BlockPos pos, int flags) {
+		for (Entry entry : this.values) {
+			world.setBlockState(pos.add(entry.pos), entry.state, flags);
+		}
+	}
 
+	public void generate(WorldAccess world, BlockPos pos) {
+		this.generate(world, pos, 3);
 	}
 }
 
